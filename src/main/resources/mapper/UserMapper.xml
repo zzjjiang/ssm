@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qhzh.dao.UserMapper">
+
+    <resultMap type="com.qhzh.entity.User" id="baseResult">
+        <result property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <sql id="columns">
+        id,username,password,create_time,update_time
+    </sql>
+    <insert id="add" parameterType="com.qhzh.entity.User">
+        insert into t_user(username,password,create_time,update_time)
+        values(#{username},#{password},now(),now())
+    </insert>
+    <delete id="delete" parameterType="int">
+        delete from t_user
+        where id = #{id}
+    </delete>
+    <update id="update" parameterType="com.qhzh.entity.User">
+        update t_user
+        <set>
+            <if test="username != '' and username != null">
+                username=#{username},
+            </if>
+            <if test="password != null">password=#{password},</if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+    <select id="detailById" parameterType="int" resultMap="baseResult">
+        select
+        <include refid="columns"></include>
+        from t_user
+        where id = #{id}
+    </select>
+
+
+    <select id="list" parameterType="string" resultMap="baseResult">
+        select
+         <include refid="columns"></include>
+        from t_user
+        <where>
+            <if test="username !='' and username != null">
+                username = LIKE CONCAT('%',#{username},'%')
+            </if>
+        </where>
+    </select>
+    <select id="count" resultType="int" parameterType="com.qhzh.entity.User">
+        select
+        count(*)
+        from t_user
+        where username = #{username}
+        and password = #{password}
+    </select>
+
+</mapper>
